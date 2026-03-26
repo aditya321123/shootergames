@@ -1,19 +1,238 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shooter Game</title>
-  <style>
-    canvas {
-      display: block;
-      margin: 0 auto;
-      background: #000;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+}
+#loginScreen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.login-box {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    text-align: center;
+}
+input {
+    padding: 10px;
+    width: 220px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-top: 10px;
+    font-size: 16px;
+}
+button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    background: #e00000;
+    color: white;
+    cursor: pointer;
+}
+button:hover {
+    background: #b00000;
+}
+#error {
+    color: red;
+    margin-top: 10px;
+}
+#app {
+    display: none;
+    height: 100vh;
+}
+.container {
+    display: flex;
+    height: 100%;
+}
+.sidebar {
+    width: 230px;
+    background: #2d3b45;
+    color: white;
+    padding: 15px;
+}
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+.logo img {
+    width: 30px;
+    height: 30px;
+}
+.logo span { font-size: 18px; }
+.link {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.link:hover { background: rgba(255,255,255,0.1); }
+.submenu {
+    padding-left: 15px;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+.submenu div {
+    padding: 5px;
+    background: rgba(255,255,255,0.1);
+    margin: 3px 0;
+    border-radius: 3px;
+    word-break: break-all;
+}
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.topbar {
+    background: white;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+    border-bottom: 1px solid #ddd;
+}
+iframe {
+    flex: 1;
+    border: none;
+}
+</style>
 </head>
+
 <body>
-  <canvas id="gameCanvas" width="800" height="600"></canvas>
-  <script src="game.js"></script>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+    <div class="login-box">
+        <h2>Dashboard Login</h2>
+        <input type="password" id="codeInput" placeholder="Enter access code"><br>
+        <button onclick="login()">Login</button><br>
+        <button onclick="createCode()">New Code</button><br>
+        <button onclick="deleteCodes()" style="background:#555;">Delete All Codes</button>
+        <div id="error"></div>
+    </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+    <div class="container">
+
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="logo">
+                <span>Dashboard</span>
+            </div>
+
+            <div class="link" onclick="openSite('https://1.physon.org.np/')">Course 1</div>
+            <div class="link" onclick="openSite('https://edu.noodleking.ca/')">Course 2</div>
+            <div class="link" onclick="openSite('https://1.beachlifeusa.com/')">Course 3</div>
+            <div class="link" onclick="openSite('https://1.beachlifeusa.com/')">Course 4</div>
+            <div class="link" onclick="openSite('https://1.beachlifeusa.com/')">Course 5</div>
+            <div class="link" onclick="openSite('https://1.beachlifeusa.com/')">Course 6</div>
+            <div class="link" onclick="openSite('https://1.beachlifeusa.com/')">Course 7</div>
+            <div class="link" onclick="openSite('https://1.noodleking.ca/')">Course 8</div>
+
+            <div class="link" style="margin-top:15px; font-weight:bold;">Access Codes</div>
+            <div id="codesSubmenu" class="submenu"></div>
+
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <!-- MAIN -->
+        <div class="main">
+            <div class="topbar">
+                <input type="text" id="urlInput" placeholder="Enter URL">
+                <button onclick="loadURL()">Go</button>
+            </div>
+            <iframe id="viewer"></iframe>
+        </div>
+    </div>
+</div>
+
+<script>
+const ADMIN_CODE = "6703";
+let CODES = [];
+
+function login() {
+    const code = document.getElementById("codeInput").value;
+    if (code === ADMIN_CODE || CODES.includes(code)) {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        document.getElementById("error").innerText = "";
+        renderCodes();
+    } else {
+        document.getElementById("error").innerText = "Wrong code";
+    }
+}
+
+function createCode() {
+    const admin = prompt("Enter admin code to generate new code:");
+    if (admin === ADMIN_CODE) {
+        const newCode = Math.floor(1000 + Math.random() * 9000).toString();
+        CODES.push(newCode);
+        renderCodes();
+    } else {
+        alert("Wrong admin code");
+    }
+}
+
+function deleteCodes() {
+    const admin = prompt("Enter admin code to delete ALL codes:");
+    if (admin === ADMIN_CODE) {
+        if (confirm("Are you sure you want to delete ALL codes?")) {
+            CODES = [];
+            renderCodes();
+        }
+    } else {
+        alert("Wrong admin code");
+    }
+}
+
+function renderCodes() {
+    const submenu = document.getElementById("codesSubmenu");
+    submenu.innerHTML = "";
+    CODES.forEach(c => {
+        const div = document.createElement("div");
+        div.innerText = c;
+        submenu.appendChild(div);
+    });
+}
+
+function logout() {
+    document.getElementById("app").style.display = "none";
+    document.getElementById("loginScreen").style.display = "flex";
+    document.getElementById("codeInput").value = "";
+}
+
+// ✅ Load inside iframe (no new tab)
+function openSite(url) {
+    document.getElementById("viewer").src = url;
+}
+
+function loadURL() {
+    let url = document.getElementById("urlInput").value;
+    if (!url.startsWith("http")) url = "https://" + url;
+    document.getElementById("viewer").src = url;
+}
+
+// ENTER key support
+document.getElementById("codeInput").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") login();
+});
+</script>
+
 </body>
 </html>
