@@ -4,114 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard</title>
-
 <style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f5f5;
-}
-#loginScreen {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-.login-box {
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    text-align: center;
-}
-input {
-    padding: 10px;
-    width: 220px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    margin-top: 10px;
-    font-size: 16px;
-}
-button {
-    padding: 10px 20px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 5px;
-    background: #e00000;
-    color: white;
-    cursor: pointer;
-}
-button:hover {
-    background: #b00000;
-}
-#error {
-    color: red;
-    margin-top: 10px;
-}
-#app {
-    display: none;
-    height: 100vh;
-}
-.container {
-    display: flex;
-    height: 100%;
-}
-.sidebar {
-    width: 230px;
-    background: #2d3b45;
-    color: white;
-    padding: 15px;
-}
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-.logo img {
-    width: 30px;
-    height: 30px;
-}
-.logo span { font-size: 18px; }
-.link {
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
-    cursor: pointer;
-}
+body { margin:0; font-family: Arial,sans-serif; background:#f5f5f5; }
+#loginScreen { display:flex; justify-content:center; align-items:center; height:100vh; }
+.login-box { background:white; padding:30px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.1); text-align:center; }
+input { padding:10px; width:220px; border-radius:5px; border:1px solid #ccc; margin-top:10px; font-size:16px; }
+button { padding:10px 20px; margin-top:10px; border:none; border-radius:5px; background:#e00000; color:white; cursor:pointer; }
+button:hover { background:#b00000; }
+#error { color:red; margin-top:10px; }
+#app { display:none; height:100vh; }
+.container { display:flex; height:100%; }
+.sidebar { width:230px; background:#2d3b45; color:white; padding:15px; }
+.link { padding:10px; margin:5px 0; border-radius:5px; cursor:pointer; }
 .link:hover { background: rgba(255,255,255,0.1); }
-.submenu {
-    padding-left: 15px;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-.submenu div {
-    padding: 5px;
-    background: rgba(255,255,255,0.1);
-    margin: 3px 0;
-    border-radius: 3px;
-    word-break: break-all;
-}
-.main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-.topbar {
-    background: white;
-    padding: 10px;
-    display: flex;
-    gap: 10px;
-    border-bottom: 1px solid #ddd;
-}
-iframe {
-    flex: 1;
-    border: none;
-}
+.submenu { padding-left:15px; font-size:14px; margin-bottom:10px; }
+.submenu div { padding:5px; background:rgba(255,255,255,0.1); margin:3px 0; border-radius:3px; word-break:break-all; }
+.main { flex:1; display:flex; flex-direction:column; }
+.topbar { background:white; padding:10px; display:flex; gap:10px; border-bottom:1px solid #ddd; }
+iframe { flex:1; border:none; }
+/* Admin Modal */
+#adminModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; }
+.modal-box { background:white; padding:20px; border-radius:10px; text-align:center; }
 </style>
 </head>
-
 <body>
 
 <!-- LOGIN -->
@@ -120,22 +35,28 @@ iframe {
         <h2>Dashboard Login</h2>
         <input type="password" id="codeInput" placeholder="Enter access code"><br>
         <button onclick="login()">Login</button><br>
-        <button onclick="createCode()">New Code</button><br>
-        <button onclick="deleteCodes()" style="background:#555;">Delete All Codes</button>
+        <button onclick="showAdminModal('create')">New Code</button><br>
+        <button onclick="showAdminModal('delete')" style="background:#555;">Delete All Codes</button>
         <div id="error"></div>
+    </div>
+</div>
+
+<!-- ADMIN MODAL -->
+<div id="adminModal">
+    <div class="modal-box">
+        <h3 id="modalTitle">Enter Admin Code</h3>
+        <input type="password" id="adminInput" placeholder="Admin Code"><br><br>
+        <input type="text" id="customCodeInput" placeholder="Custom Code" style="display:none;"><br>
+        <button onclick="submitAdmin()">Submit</button>
+        <button onclick="closeModal()" style="background:#555;">Cancel</button>
     </div>
 </div>
 
 <!-- APP -->
 <div id="app">
     <div class="container">
-
         <!-- SIDEBAR -->
         <div class="sidebar">
-            <div class="logo">
-                <span>Dashboard</span>
-            </div>
-
             <div class="link" onclick="openSite('https://1.physon.org.np/')">Course 1</div>
             <div class="link" onclick="openSite('https://edu.noodleking.ca/')">Course 2</div>
             <div class="link" onclick="openSite('https://1.beachlifeusa.com/')">Course 3</div>
@@ -147,6 +68,7 @@ iframe {
 
             <div class="link" style="margin-top:15px; font-weight:bold;">Access Codes</div>
             <div id="codesSubmenu" class="submenu"></div>
+            <button id="showCodesBtn" onclick="toggleCodes()" style="display:none;">Show Codes</button>
 
             <button onclick="logout()">Logout</button>
         </div>
@@ -164,11 +86,22 @@ iframe {
 
 <script>
 const ADMIN_CODE = "6703";
-let CODES = ["6702", "6701", "6700"];
+let CODES = [];
+let actionType = "";
+let isAdmin = false;
+let showingCodes = false;
 
+// LOGIN
 function login() {
     const code = document.getElementById("codeInput").value;
-    if (code === ADMIN_CODE || CODES.includes(code)) {
+    if (code === ADMIN_CODE) {
+        isAdmin = true;
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        document.getElementById("error").innerText = "";
+        renderCodes();
+    } else if (CODES.includes(code)) {
+        isAdmin = false;
         document.getElementById("loginScreen").style.display = "none";
         document.getElementById("app").style.display = "block";
         document.getElementById("error").innerText = "";
@@ -178,61 +111,106 @@ function login() {
     }
 }
 
-function createCode() {
-    const admin = prompt("Enter admin code to generate new code:");
-    if (admin === ADMIN_CODE) {
-        const newCode = Math.floor(1000 + Math.random() * 9000).toString();
-        CODES.push(newCode);
-        renderCodes();
+// LOGOUT
+function logout() {
+    isAdmin = false;
+    showingCodes = false;
+    document.getElementById("app").style.display = "none";
+    document.getElementById("loginScreen").style.display = "flex";
+}
+
+// ADMIN MODAL
+function showAdminModal(type) {
+    actionType = type;
+    document.getElementById("adminModal").style.display = "flex";
+    const adminInput = document.getElementById("adminInput");
+    const customCodeInput = document.getElementById("customCodeInput");
+    adminInput.value = "";
+    customCodeInput.value = "";
+
+    if(type === 'create') {
+        document.getElementById("modalTitle").innerText = "Enter Admin Code to create new code";
+        customCodeInput.style.display = "inline-block";
+        customCodeInput.placeholder = "Custom Code (optional)";
     } else {
-        alert("Wrong admin code");
+        document.getElementById("modalTitle").innerText = "Enter Admin Code to delete all codes";
+        customCodeInput.style.display = "none";
     }
 }
 
-function deleteCodes() {
-    const admin = prompt("Enter admin code to delete ALL codes:");
-    if (admin === ADMIN_CODE) {
-        if (confirm("Are you sure you want to delete ALL codes?")) {
-            CODES = [];
-            renderCodes();
+function closeModal() { document.getElementById("adminModal").style.display = "none"; }
+
+function submitAdmin() {
+    const input = document.getElementById("adminInput").value;
+    if (input !== ADMIN_CODE) { alert("Wrong admin code"); return; }
+
+    if (actionType === "create") {
+        let newCode = document.getElementById("customCodeInput").value;
+        if(!newCode) { 
+            // random if empty
+            newCode = Math.floor(1000 + Math.random() * 9000).toString();
         }
-    } else {
-        alert("Wrong admin code");
+        CODES.push(newCode);
+        alert("New code added: " + newCode);
     }
+
+    if (actionType === "delete") {
+        if (confirm("Delete ALL codes?")) {
+            CODES = [];
+        }
+    }
+
+    renderCodes();
+    closeModal();
 }
 
+// SHOW/HIDE CODES (admin only)
+function toggleCodes() {
+    showingCodes = !showingCodes;
+    renderCodes();
+}
+
+// RENDER CODES
 function renderCodes() {
     const submenu = document.getElementById("codesSubmenu");
+    const btn = document.getElementById("showCodesBtn");
     submenu.innerHTML = "";
-    CODES.forEach(c => {
+
+    if (!isAdmin) {
+        btn.style.display = "none";
+        return;
+    }
+
+    btn.style.display = "block";
+    if (!showingCodes) return;
+
+    CODES.forEach((c,index) => {
         const div = document.createElement("div");
-        div.innerText = c;
+        div.innerHTML = `${c} <button onclick="disableCode(${index})" style="margin-left:10px; background:#900;">X</button>`;
         submenu.appendChild(div);
     });
 }
 
-function logout() {
-    document.getElementById("app").style.display = "none";
-    document.getElementById("loginScreen").style.display = "flex";
-    document.getElementById("codeInput").value = "";
+// DISABLE CODE
+function disableCode(index) {
+    if(confirm("Disable this code?")) {
+        CODES.splice(index,1);
+        renderCodes();
+    }
 }
 
-// ✅ Load inside iframe (no new tab)
-function openSite(url) {
-    document.getElementById("viewer").src = url;
-}
-
+// IFRAME
+function openSite(url) { document.getElementById("viewer").src = url; }
 function loadURL() {
     let url = document.getElementById("urlInput").value;
-    if (!url.startsWith("http")) url = "https://" + url;
+    if(!url.startsWith("http")) url = "https://" + url;
     document.getElementById("viewer").src = url;
 }
 
-// ENTER key support
+// ENTER key support for login
 document.getElementById("codeInput").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") login();
+    if(e.key === "Enter") login();
 });
 </script>
-
 </body>
 </html>
